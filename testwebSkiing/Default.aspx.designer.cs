@@ -7,13 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace testwebSkiing
-{
-
-
-    public partial class _Default
-    {
-
+namespace testwebSkiing {
+    
+    
+    public partial class _Default {
+        
         /// <summary>
         /// Button1 control.
         /// </summary>
@@ -22,7 +20,7 @@ namespace testwebSkiing
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button Button1;
-
+        
         /// <summary>
         /// TextBox1 control.
         /// </summary>
@@ -30,6 +28,6 @@ namespace testwebSkiing
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TextBox1;
+        protected global::System.Web.UI.WebControls.Label TextBox1;
     }
 }

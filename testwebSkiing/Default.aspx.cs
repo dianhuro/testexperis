@@ -31,10 +31,10 @@ namespace testwebSkiing
             MaxCaida = 0;
             MaxDistancia = 0;
             Pasoanterior = 0;
-            
+            listarutas.Clear();
             lista.Clear();
 
-            string FilePath = Server.MapPath("/Mapas/4x4.txt");
+            string FilePath = Server.MapPath("/Mapas/map.txt");
             string textFile = FilePath;
             string[] lines = File.ReadAllLines(textFile);
             string linea = "";
@@ -70,7 +70,7 @@ namespace testwebSkiing
                     if (MaxDistancia < mapa[x, y])
                     {                        
 
-                         traverse(x, y, 1, mapa[x, y],mapa,m);
+                       traverse(x, y, 1, mapa[x, y],mapa,m);
                        listarutas.Add(string.Join<int>(",", lista));
                         lista.Clear();
                     }
@@ -78,25 +78,31 @@ namespace testwebSkiing
             }
             List<string> rutasfinal = new List<string>();
             foreach(var ruta in listarutas)
-            {            
-                var ruta1n = ruta.Split(Convert.ToChar((ruta.Substring(0, 1))));
-                foreach(var x in ruta1n)
+            {
+                var aux1 = ruta.Split(',')[0];
+                var ruta1n = ruta.Split(new string[] { aux1.ToString() + "," }, StringSplitOptions.None);
+                
+                foreach (var x in ruta1n)
                 {
-                    if (x.Split(',').Select(tag => tag.Trim()).Where(tag => !string.IsNullOrEmpty(tag)).Distinct().Count() == MaxDistancia - 2)
+                    var y = x.Split(',').Select(tag => tag.Trim()).Where(tag => !string.IsNullOrEmpty(tag)).Distinct().ToList();
+                    if (y.Count() > 3)
                     {
-                        var y = x.Split(',').Distinct();
-
-                        rutasfinal.Add(ruta.Substring(0, 1) + string.Join<string>(",", y));
+                        if (Convert.ToInt32(y.Last()) > Convert.ToInt32(y[y.Count()-2]))
+                        {
+                             y.RemoveAt(y.Count() - 1);
+                            y = y.Distinct().ToList();
+                        }
+                    }
+                    if (y.Count() == MaxDistancia - 1)
+                    {
+                        //if (Convert.ToInt32(aux1)- Convert.ToInt32(y.Last()) == MaxCaida)  
+                        rutasfinal.Add(aux1+"," + string.Join<string>(",", y));
+                        
                     }
                 }
 
             }
-
-          
-
-
-
-            TextBox1.Text = "Distancia: " + MaxDistancia + " caida:" + MaxCaida +". Ruta: "+ rutasfinal.FirstOrDefault();
+            TextBox1.Text = "Length: " + MaxDistancia + " Drop:" + MaxCaida +". Path: "+ rutasfinal.LastOrDefault();
         }
 
         private void traverse(int x, int y, int distancia, int inicio,int[,] mapa,int tamaño)
@@ -113,22 +119,34 @@ namespace testwebSkiing
                 var isInsideGraph = x + xAxis[k] >= 0 && x + xAxis[k] < tamaño && y + yAxis[k] >= 0 && y + yAxis[k] < tamaño;
                 if (isInsideGraph && (mapa[x, y] > mapa[x + xAxis[k],y + yAxis[k]]))
                 {
-            
+                    if (mapa[x, y] == inicio)
+                    {
+                        lista.Add(mapa[x, y]);
+                    }
                     //if can traverse and the current value is bigger the the next traverse point.
                     //set the length and keep the start point. to calculate the maxlength and drop later.
+                    else if (!(mapa[x, y] > lista.Last())){
+                        lista.Add(mapa[x, y]);
+                    }
 
-                     lista.Add(mapa[x, y]);
+                   
                     traverse(x + xAxis[k], y + yAxis[k], distancia + 1, inicio,mapa, tamaño);
                    
                 }
             }
             //current drop
-            var caida = inicio - mapa[x,y];
+            int caida=0;
             if (distancia > MaxDistancia)
             {
-                Ruta = inicio.ToString();
+                caida = inicio - mapa[x, y];
+                lista.Add(mapa[x, y]);
                 MaxDistancia = distancia;
                 MaxCaida = caida;
+            }
+            if (distancia == MaxDistancia)
+            {
+                caida = inicio - mapa[x, y];
+                lista.Add(mapa[x, y]);
             }
 
             //the use case where by length is the same but the drop is greater
